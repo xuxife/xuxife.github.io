@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Home | xuxife</title>
+    <link>https://xuxife.github.io/posts/</link>
+    <description>Recent content in Posts on Home | xuxife</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zn-Hans</language>
+    <lastBuildDate>Wed, 07 Nov 2018 19:58:08 +0800</lastBuildDate>
+    
+	<atom:link href="https://xuxife.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>FirstPost</title>
+      <link>https://xuxife.github.io/posts/firstpost/</link>
+      <pubDate>Wed, 07 Nov 2018 19:58:08 +0800</pubDate>
+      
+      <guid>https://xuxife.github.io/posts/firstpost/</guid>
+      <description> Test for Github Page  List  Order    //export pthJob func pthJob(ptr unsafe.Pointer) unsafe.Pointer { rank := int(*(*float64)(ptr)) sliceLen := length if rank == size-1 { sliceLen += left } result := buildSlice(sliceLen, ptr) tasks := generateTask(rank, size) for i := range tasks { result[i] = mandelbrot(tasks[i]) } return nil }  </description>
+    </item>
+    
+  </channel>
+</rss>

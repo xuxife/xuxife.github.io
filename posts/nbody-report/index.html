@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zn-Hans">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1" />
+  <meta name="author" content="xuxife">
+  <meta name="description" content="N-body simulation report, the 3rd assignment of CSC4005">
+  
+  <meta property="og:title" content="Report of Parallel N-Body Simulation" />
+<meta property="og:description" content="N-body simulation report, the 3rd assignment of CSC4005" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xuxife.github.io/posts/nbody-report/" /><meta property="article:published_time" content="2018-11-22T12:01:00&#43;08:00"/>
+<meta property="article:modified_time" content="2018-11-22T12:01:00&#43;08:00"/>
+
+
+  <title>
+  
+       Report of Parallel N-Body Simulation | Home | xuxife 
+  
+  </title>
+
+  <link rel="canonical" href="https://xuxife.github.io/posts/nbody-report/">
+
+  
+  
+
+  
+  <link href="https://xuxife.github.io/css/vendors-extensions/fontawesome/all.min.css" rel="stylesheet">
+
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:300,400,500,600">
+  <link href="https://xuxife.github.io/css/font.css" rel="stylesheet"> 
+    
+  
+  <link href="https://xuxife.github.io/css/vendors/bootstrap4/bootstrap.min.css" rel="stylesheet">
+  <link href="https://xuxife.github.io/css/vendors-extensions/mdb/mdb.min.css" rel="stylesheet"> 
+  <link href="https://xuxife.github.io/css/vendors/mdb/style.min.css" rel="stylesheet"> 
+  <link href="https://xuxife.github.io/css/main.css" rel="stylesheet">
+
+
+  
+  <link rel="shortcut icon"
+  
+      href="https://xuxife.github.io/img/favicon.png"
+  
+  >
+
+
+  
+  
+
+  <style type="text/css">
+      @media (min-width: 800px) and (max-width: 850px) {
+              .navbar:not(.top-nav-collapse) {
+                  background: #1C2331!important;
+              }
+          }
+  </style>
+
+
+  
+    
+    <link rel="stylesheet" href="https://xuxife.github.io/js/vendors/katex/katex.min.css">
+  
+  
+
+  
+    
+    <link rel="stylesheet" href="https://xuxife.github.io/css/vendors/highlight/github-gist.css">
+  
+
+</head>
+
+  <body class="bg-light" data-spy="scroll" data-target="#page-scrollspy" data-offset="90">
+  
+    
+    
+
+    
+      
+
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar">
+    <div class="container">
+
+      
+      <a class="navbar-brand" href="https://xuxife.github.io">
+          
+        <img class="avatar" src="https://xuxife.github.io/img/favicon.png" style="width: 40px!important;height: auto;"  class="d-inline-block align-top" alt="" >
+        
+        <strong> xuxife</strong>
+      </a>
+
+      
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        
+        <ul class="navbar-nav mr-auto ">
+          <li class="nav-item ">
+            <a class="nav-link" href="https://xuxife.github.io">Home</a>
+          </li>
+          
+        </ul>
+
+      </div>
+
+    </div>
+  </nav>
+  
+ 
+      
+ 
+
+
+
+
+
+
+<div id="site-header" class="carousel slide carousel-fade" data-ride="carousel" style="height: 18rem;" >  
+
+  
+  
+  
+
+  
+  <div class="carousel-inner" role="listbox">
+    
+      
+
+        
+        <div class="carousel-item active">
+          <div class="view" style="background-image: url('https://xuxife.github.io/img/header-slides/FDD65BF97A581613C0E633F081326C4B-2880-0.png'); background-repeat: no-repeat; background-size: cover;">
+
+            
+            <div class="mask rgba-black-light d-flex justify-content-center align-items-center">
+
+              
+              
+              
+
+            </div>
+            
+
+          </div>
+        </div>
+        
+      
+    
+      
+
+        
+        <div class="carousel-item">
+          <div class="view" style="background-image: url('https://xuxife.github.io/img/header-slides//ash-edmonds-636862-unsplash.jpg'); background-repeat: no-repeat; background-size: cover;">
+
+            
+            <div class="mask rgba-black-light d-flex justify-content-center align-items-center">
+
+            
+
+            </div>
+            
+
+          </div>
+        </div>
+        
+      
+    
+
+  
+  </div>
+  
+
+  
+  <div class="carousel-content text-center white-text wow fadeIn">
+    <div class="row mx-0 headfont mt-3 pt-4">
+      
+      <div class="col-12 col-sm-5 align-middle">
+        <a href="https://xuxife.github.io">
+          
+            <img class="pull-right avatar avatar-md" src="https://xuxife.github.io/img/favicon.png" alt="" >
+          
+        </a>
+      </div>
+      
+      <div class="col-12 col-sm-7 text-left pl-2">
+        <a href="https://xuxife.github.io">
+          <h1 class="mb-2 h1" style="font-weight: 300;" >
+            <strong>Home | xuxife</strong>
+          </h1>
+        </a>
+        
+
+             
+        <div class="mt-2" style="font-size: 1rem; color: white;">
+            
+              <a href="//github.com/xuxife" target="_blank" rel="noopener"><i class="fab fa-github pr-1" aria-hidden="true"></i></a>    
+            
+            
+
+            
+
+            
+
+            
+
+            
+    
+            
+    
+        
+            
+                <a href="mailto:xuxife@gmail.com"><i class="far fa-envelope-open pr-1" aria-hidden="true"></i></a>
+            
+    
+            
+
+            
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  
+  
+  
+
+</div>
+  
+    
+
+    
+  
+  <main class="post-main-wrapper">
+    
+    
+    <div class="row">
+
+      
+
+      
+      <div class="container pr-5">
+      
+
+        
+        <div class="z-depth-1  post-wrapper white-bg single-post">
+
+          <div class="post-header text-center" >
+  <ul class="post-meta li-x">
+    
+      
+        <li><a href="https://xuxife.github.io/categories/report"><i class="fas fa-folder-open pr-1" aria-hidden="true"></i> report </a></li>
+      
+    
+    
+  </ul>
+
+  <div class="px-4 post-heading">Report of Parallel N-Body Simulation</div>
+
+  <ul class="post-meta li-x mt-1">
+    
+      <li>Nov 22, 2018</li>
+    
+
+    
+      <li class="middot"></li>
+      <li>8 minutes read</li>
+    
+  </ul>
+  
+
+</div>
+
+
+          <div class="post-content markdown">
+            
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+  });
+  MathJax.Hub.Queue(function() {
+    // Fix <code> tags after MathJax finishes running. This is a
+    // hack to overcome a shortcoming of Markdown. Discussion at
+    // https://github.com/mojombo/jekyll/issues/199
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+
+  MathJax.Hub.Config({
+  // Autonumbering by mathjax
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+</script>
+
+<ul>
+<li>Author: Xu Xingfei (116010252)</li>
+<li>Email: <a href="mailto://116010252@link.cuhk.edu.cn">116010252@link.cuhk.edu.cn</a></li>
+<li>Online version: <a href="#https://xuxife.github.io/posts/nbody-report">https://xuxife.github.io/posts/nbody-report</a></li>
+<li>Source code: <a href="https://github.com/xuxife/nbody">https://github.com/xuxife/nbody</a></li>
+</ul>
+
+<h2 id="how-to-use">How to Use</h2>
+
+<ul>
+<li>Call <code>./nbody</code> check the help manual</li>
+</ul>
+
+<pre><code class="language-shell">  Usage: ./nbody [-args] ppseq|pppth|ppmpi
+    -color
+          the bodies have color or not
+    -h int
+          height, the window height (default 500)
+    -m float
+          mass, the supreme mass of bodies (kg) (default 1e+10)
+    -mr float
+          the ratio of distance that two bodies would merge if they are too close, 0 for not merge (default 0.2)
+    -n int
+          (n)-body, the number bodies to simulate (default 100)
+    -r float
+          radius, the supreme radius of bodies (m), we can infer that all bodies have same density (default 5)
+    -s int
+          the random seed (default 1)
+    -sw float
+          simulation width distance (default 500)
+    -t int
+          the number of threads to call (only for pthread) (default 2)
+    -w int
+          width, the window width (default 500)
+</code></pre>
+
+<p>For instance, run a 100x100 window to simulate 100 bodies (with color and maximum radius 3, not merge) in 500 meter width scope, the method is 4 threads pthread, then the command is <code>./nbody -w 100 -h 100 -n 100 -r 3 -sw 500 -color -t 4 pppth</code></p>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/21/5bf55b8ef18cd.gif" width="250px"/>
+</center></p>
+
+<h2 id="problem-analysis">Problem Analysis</h2>
+
+<h3 id="spec">Spec</h3>
+
+<p>Let&rsquo;s name the environment as <strong>Space</strong>, and the objects interacting within space are <strong>Body</strong>(s).</p>
+
+<p>Then we set the following constrains for space and bodies.</p>
+
+<ul>
+<li>Space is bounded, which means a body would bounce back when it collides on the boundary.</li>
+<li>Bodies are sphere(round) having <strong>mass</strong> and <strong>radius</strong>. A body also has two two-dimension vectors: <strong>location</strong> and <strong>velocity</strong>.</li>
+<li>One turn means once <strong>updating velocity</strong>(acceleration) then <strong>updating location</strong>(move).</li>
+</ul>
+
+<h3 id="collision-and-merge">Collision and Merge</h3>
+
+<ul>
+<li><p>When a body collides to the space boundary,  the body&rsquo;s velocity turns its direction opposite and remains the quantity.</p></li>
+
+<li><p>In order to simulate astronomical planets, two bodies would merge into one body if the distance is too close after collision.</p></li>
+</ul>
+
+<h2 id="partical-to-partical">Partical to Partical</h2>
+
+<h3 id="gravitation">Gravitation</h3>
+
+<p>The gravitational force follows: $$F= \frac{Gm_1m_2}{r^2}$$</p>
+
+<p>where $G$ is the gravitational constant, $m_1,m_2$ are masses, $r$ is the distance between two bodies.</p>
+
+<p>Then according to Newton&rsquo;s second law: $F=ma$, the acceleration of $m_1$ is $a_1=\frac{F}{m_1}=\frac{Gm_2}{r^2}$</p>
+
+<p>Now consider in two-dimension space. $m_1$ locates at $(x_1,y_1)$, $m_2$ locates at $(x_2,y_2)$. Then the difference of location is $\vec d =(x_2-x_1, y_2-y_1)$, which is a vector, $|\vec d|=r$.  Then $\vec F$ and $\vec a_1$ are both vectors in two dimension, and they have the same direction as $\vec d$.</p>
+
+<p>According to Newton&rsquo;s third law, the gravitational forces between two bodies are exactly opposite. The acceleartions are
+$$\vec a_1 = \frac{Gm_2}{r^3}\vec d, \quad\vec a_2 = -\frac{Gm_1}{r^3}\vec d$$
+We can move a common factor $\vec f = \frac{G}{r^3}\vec d$ out. Then $\vec a_1=\vec f m_2, \vec a_2=-\vec fm_1$.</p>
+
+<p>The factor $\vec f$ only needs to be computed once between two bodies. This decreases the partical to partial algorithm from $n^2$ computations to $\frac{n(n-1)}{2}$ computations.</p>
+
+<h3 id="interact">Interact</h3>
+
+<p>Let&rsquo;s define the interaction between two bodies:</p>
+
+<pre><code class="language-go">// Interact is what a body interacts with another body
+// the force/(m1 * m2) would be returned.
+// The acceleration of b = f * ob.Mass
+func (b *Body) Interact(ob *Body) (f r2.Point, merge bool) {
+	delta := ob.Loc.Sub(b.Loc)
+	if r := delta.Norm(); r &gt;= MergeDistanceRatio*(b.Radius+ob.Radius) {
+		f = delta.Mul(G / (r * r * r))
+	} else {
+		merge = IsMerge
+	}
+	return
+}
+</code></pre>
+
+<p>The ratio $\vec f = \frac{G\vec d}{r^3}$, where $\vec d$ is the location difference vector of two bodies.</p>
+
+<p>If two bodies are too close, $|\vec d| \le Ratio\times(r_1+r_2)$, then two bodies would merge into a new body:</p>
+
+<pre><code class="language-go">// Merge merges two bodies into one body
+// with summation mass and radius
+// and velocity follows conservation of momentum
+func (b *Body) Merge(ob *Body) (nb Body) {
+	mass := b.Mass + ob.Mass
+	c := b.Color
+	if ob.Mass &gt; b.Mass {
+		c = ob.Color
+	}
+	r := math.Pow(math.Pow(b.Radius, 3)+math.Pow(ob.Radius, 3), 1.0/3)
+	loc := b.Loc.Mul(b.Mass).Add(ob.Loc.Mul(ob.Mass)).Mul(1 / (b.Mass + ob.Mass))
+	vel := b.Vel.Mul(b.Mass).Add(ob.Vel.Mul(ob.Mass)).Mul(1 / (b.Mass + ob.Mass))
+	return NewBody(mass, r, c, loc, vel)
+}
+</code></pre>
+
+<p>The new mass is the summation of two bodies&rsquo; masses. New color is the color of the one having large mass. The radius is determined by consistent density. The new location and velocity is calculated by conservation of monmentum.</p>
+
+<p>If ratio is setted to 0 , then no merging would happen, also the consequence gravity assist would be ignore.</p>
+
+<h3 id="sequence">Sequence</h3>
+
+<pre><code class="language-go">// UpdateVelocity computes the forces between bodyies
+// and accelerations, then update bodies' velocity
+func (s *Sequence) UpdateVelocity(d time.Duration) {
+	for i := 0; i &lt; len(s.Bodys)-1; i++ {
+		for j := i + 1; j &lt; len(s.Bodys); j++ {
+			b, ob := &amp;s.Bodys[i], &amp;s.Bodys[j]
+			f, isMerge := b.Interact(ob)
+			if !isMerge {
+				b.Accelerate(f.Mul(ob.Mass).Mul(d.Seconds()))
+				ob.Accelerate(f.Mul(-b.Mass).Mul(d.Seconds()))
+			} else {
+				s.Bodys[i] = b.Merge(ob)
+				s.Bodys[j] = s.Bodys[len(s.Bodys)-1]
+				s.Bodys = s.Bodys[:len(s.Bodys)-1]
+			}
+		}
+	}
+}
+</code></pre>
+
+<p>If there are n bodies, then the number of combinations is n(n-1)/2. Every combination would only be computed once, because the forces on two bodies of this combination has an opposite direction and same quantity.</p>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/21/5bf5524dbfb69.png" height="100px"/>
+</center></p>
+
+<p>For instance, 4 bodies would only have 6 “<strong>Interactions</strong>”, 12 “<strong>Accelerations</strong>” and some “<strong>Merge</strong>” (if happened) in one turn.</p>
+
+<h3 id="pthread">Pthread</h3>
+
+<pre><code class="language-go">length := len(pt.Bodys) * (len(pt.Bodys) - 1) / (2 * psize) // (n * (n-1) / 2) / size
+for i, n := 0, 0; i &lt; len(pt.Bodys)-1; i++ {
+	for j := i + 1; j &lt; len(pt.Bodys); j++ {
+		if n &gt;= rank*length &amp;&amp; ((rank &lt; psize-1 &amp;&amp; n &lt; (rank+1)*length) || rank == psize-1) {
+			mu.Lock()
+			b, ob := &amp;pt.Bodys[i], &amp;pt.Bodys[j]
+			f, isMerge := b.Interact(ob)
+			if !isMerge {
+				pt.Bodys[i].Accelerate(f.Mul(ob.Mass).Mul(d.Seconds()))
+				pt.Bodys[j].Accelerate(f.Mul(-b.Mass).Mul(d.Seconds()))
+			} else {
+				pt.Bodys[i] = pt.Bodys[i].Merge(&amp;pt.Bodys[j])
+				pt.Bodys[j] = pt.Bodys[len(pt.Bodys)-1]
+				pt.Bodys = pt.Bodys[:len(pt.Bodys)-1]
+			}
+			mu.Unlock()
+		}
+		n++
+	}
+}
+</code></pre>
+
+<p>Same logic as the <a href="#Sequence">Sequence</a>, but pthread adds the division of labour: every thread only has <code>length</code> tasks. <code>length</code> is determined by size of threads (number of workers). Every thread should have an equal number of tasks. For instance, if there are 7 combination (tasks) and 2 threads, the division would look like:</p>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/21/5bf55f5bec9f2.png" height="100px"/>
+</center></p>
+
+<h4 id="move-mutex-locker-out">Move mutex locker out</h4>
+
+<p>Notice that the mutex locker is inside of loops, which could cost a lot on frequent locking and unlocking. I consider move the mutex locker out of loop, then only lock and unlock once per turn.</p>
+
+<pre><code class="language-go">dv := make([]r2.Point, len(pt.Bodys))
+merge := make([]int, 0)
+for i, n := 0, 0; i &lt; len(pt.Bodys)-1; i++ {
+	for j := i + 1; j &lt; len(pt.Bodys); j++ {
+		if n &gt;= rank*length &amp;&amp; ((rank &lt; psize-1 &amp;&amp; n &lt; (rank+1)*length) || rank == psize-1) {
+			b, ob := &amp;pt.Bodys[i], &amp;pt.Bodys[j]
+			f, isMerge := b.Interact(ob)
+			if !isMerge {
+				dv[i] = dv[i].Add(f.Mul(ob.Mass).Mul(d.Seconds()))
+				dv[j] = dv[j].Add(f.Mul(-b.Mass).Mul(d.Seconds()))
+			} else {
+				merge = append(merge, i, j)
+			}
+		}
+		n++
+	}
+}
+mu.Lock()
+for i := range dv {
+	pt.Bodys[i].Accelerate(dv[i])
+}
+for i := 0; i &lt; len(merge); i += 2 {
+	pt.Bodys[merge[i]] = pt.Bodys[merge[i]].Merge(&amp;pt.Bodys[merge[i+1]])
+	pt.Bodys[merge[i+1]].Mass = 0.0
+	remove = append(remove, merge[i+1])
+}
+mu.Unlock()
+</code></pre>
+
+<p>I added <code>dv</code> and <code>merge</code> (two arrays), where stores the velocity differences for all bodies in this time interval, <code>merge</code> stores the indexes of merged bodies. After threads finish its job, the difference of velocity would be added onto bodies, the merged bodies are removed.</p>
+
+<p>The benchmark also shows a boost (the shorter, the faster) after moving the mutex locker out of loops:</p>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/21/5bf5665d799f2.png" height="200px"/>
+</center></p>
+
+<h3 id="mpi">MPI</h3>
+
+<p>MPI implement is similar to the thought of Pthread with mutex locker out.</p>
+
+<pre><code class="language-go">// UpdateVelocity can seperate the computation equally
+// and broadcast the difference of velocity as well as the merging bodies' indexes
+func (mpi *MPI) UpdateVelocity(d time.Duration) {
+	rank, size := mpi.Rank, mpi.Size
+	dv := make([]r2.Point, len(mpi.Bodys))
+	merge := make([]int, 0)
+	length := len(mpi.Bodys) * (len(mpi.Bodys) - 1) / (2 * size)
+	for i, n := 0, 0; i &lt; len(mpi.Bodys)-1; i++ {
+		for j := i + 1; j &lt; len(mpi.Bodys); j++ {
+			if n &gt;= rank*length &amp;&amp; ((rank &lt; size-1 &amp;&amp; n &lt; (rank+1)*length) || rank == size-1) {
+				b, ob := &amp;mpi.Bodys[i], &amp;mpi.Bodys[j]
+				if f, isMerge := b.Interact(ob); !isMerge {
+					dv[i] = dv[i].Add(f.Mul(ob.Mass).Mul(d.Seconds()))
+					dv[j] = dv[j].Add(f.Mul(-b.Mass).Mul(d.Seconds()))
+				} else {
+					merge = append(merge, i, j)
+				}
+			}
+			n++
+		}
+	}
+	// C.MPI_Allreduce(C.MPI_IN_PLACE, ptr(&amp;dv[0]), C.int(2*n), C.MPI_DOUBLE, C.MPI_SUM, C.MPI_COMM_WORLD)
+	dv = mpi.reduce(dv)
+	for i := range mpi.Bodys {
+		mpi.Bodys[i].Accelerate(dv[i])
+	}
+	mpi.mergeAll(merge)
+}
+</code></pre>
+
+<p>Here <code>reduce</code> communicates all processes and return the summation of all <code>dv</code>, the action is same as the expected <code>MPI_Allreduce</code> does. However, <code>MPI_Allreduce</code> with op <code>MPI_SUM</code> does <strong>NOT</strong> support <code>MPI_DOUBLE</code>!!</p>
+
+<p>So <code>reduce</code> is my implement that did a <code>MPI_Gather</code> then <code>MPI_Bcast</code> after summation in rank 0.</p>
+
+<p><code>mergeAll</code> does <code>Allgather</code>  <code>merge</code> array for every processes. Then every processes can following the <code>dv</code> and <code>merge</code> to update the bodies in space.</p>
+
+<h2 id="analysis">Analysis</h2>
+
+<p>After 100 iterations&rsquo; experiment benchmark, the concurrency methods shows an apperant boost for nbody simulation.</p>
+
+<p>Here the space is 10000x10000 and 1000 bodies are simulated inside. The y value is the time cost per run (ns/op).</p>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/22/5bf5fdc8a8f16.png" height="330px"/>
+</center></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The experiments are done in my own laptop instead of lab cluster (I tried, but the cluster is so busy that the figure shows very slowly). It&rsquo;s probably better to download the binary program and execute locally. Because the Xlib window redraw the pixmap every turn, which costs many bandwidth if running remotely.</p>
+
+<p>If the window and display shows too slow, consider a smaller width and height.</p>
+
+<p>Due to lack of time, I didn&rsquo;t write the quadric tree method (Barnes-Hut algorithm). However, we can still see a huge boost in $O(n^2)$ partical to partical algorithm with the help of parallel.</p>
+
+          </div>
+
+          
+          <div class="row">
+            <div class="col-md-8">
+            
+            </div>
+            
+          </div>
+          
+
+          
+          <div class="row pt-3">
+            <div class="col-md-6">
+              
+            </div>
+            
+            <div class="col-md-6 text-right" >
+              
+            </div>
+          </div>
+
+          
+
+        </div>
+        
+
+      </div>
+      
+
+      
+
+    </div>
+    
+
+
+  </main>
+  
+
+
+    
+    
+
+<footer class="page-footer text-center font-small mt-4 wow fadeIn">
+
+
+  
+  <div class="pb-2 mt-5 pt-5">
+    
+      <a href="//github.com/xuxife " target="_blank" rel="noopener"><i class="fab fa-github mr-3" aria-hidden="true"></i></a>    
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    
+        <a href="mailto:xuxife@gmail.com"><i class="far fa-envelope-open mr-3" aria-hidden="true"></i></a>
+    
+
+    
+
+    
+
+  </div>
+  
+
+  
+  <div class="copyright py-4">
+    
+    <span>  2016 - 2018 &copy; | Theme <a href='https://github.com/orianna-zzo/AllinOne' target="_blank">AllinOne</a> by <a href='https://github.com/orianna-zzo' target="_blank">Orianna</a>  </span>
+  </div>
+  
+
+</footer>
+
+
+    
+
+
+
+
+
+
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/jquery/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/jquery/jquery.smooth-scroll.min.js"></script>
+
+
+
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/popper.min.js"></script>
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/holder.min.js"></script>
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors-extensions/bootstrap4/bootstrap.js" ></script>
+
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/mdb/mdb.min.js"></script>
+
+<script type="text/javascript" src="https://xuxife.github.io/js/main.js"></script>
+
+
+
+  
+  <script src="https://xuxife.github.io/js/vendors/highlight.pack.js"> </script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+ 
+  <script src="https://xuxife.github.io/js/vendors/katex/katex.min.js"> </script>
+  <script src="https://xuxife.github.io/js/vendors/katex/contrib/auto-render.min.js"></script>
+
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          renderMathInElement(document.body);
+      });
+  </script>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+  
+  new WOW().init();
+</script>
+
+
+
+
+  </body>
+</html>

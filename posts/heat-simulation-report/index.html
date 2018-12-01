@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zn-Hans">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1" />
+  <meta name="author" content="xuxife">
+  <meta name="description" content="MathJax.Hub.Config({ tex2jax: { inlineMath: [[&#39;$&#39;,&#39;$&#39;], [&#39;\\(&#39;,&#39;\\)&#39;]], displayMath: [[&#39;$$&#39;,&#39;$$&#39;]], processEscapes: true, processEnvironments: true, skipTags: [&#39;script&#39;, &#39;noscript&#39;, &#39;style&#39;, &#39;textarea&#39;, &#39;pre&#39;], TeX: { equationNumbers: { autoNumber: &#34;AMS&#34; }, extensions: [&#34;AMSmath.js&#34;, &#34;AMSsymbols.js&#34;] } } }); MathJax.Hub.Queue(function() { // Fix  tags after MathJax finishes running. This is a // hack to overcome a shortcoming of Markdown. Discussion at // https://github.com/mojombo/jekyll/issues/199 var all = MathJax.Hub.getAllJax(), i; for(i = 0; i  Author: Xingfei Xu (116010252) Email: 116010252@link.cuhk.edu.cn Online Version: https://xuxife.github.io/posts/heat-simulation-report Source Code: https://github.com/xuxife/heat-simulation  Usage  Call ./heat-simulation to check the usage manual.  Usage: ./heat-simulation [-args] seq|pth|mpi -down whether down wall is on fire -f float the default temperature of fire (default 100) -h int the height of window (default 400) -left whether left wall is on fire -n int the number of threads (only for pthread) (default 2) -r float the default temperature in the room (default 20) -right whether right wall is on fire -up whether up wall is on fire -w int the width of window (default 400)   For instance, ./heat-simulation -w 200 -h 200 -up -n 2 pth will use two threads and create a 200x200 window with burning up wall.  Following output would be printed when the program begins running:">
+  
+  <meta property="og:title" content="Report of Heat Parallel Simulation" />
+<meta property="og:description" content="MathJax.Hub.Config({ tex2jax: { inlineMath: [[&#39;$&#39;,&#39;$&#39;], [&#39;\\(&#39;,&#39;\\)&#39;]], displayMath: [[&#39;$$&#39;,&#39;$$&#39;]], processEscapes: true, processEnvironments: true, skipTags: [&#39;script&#39;, &#39;noscript&#39;, &#39;style&#39;, &#39;textarea&#39;, &#39;pre&#39;], TeX: { equationNumbers: { autoNumber: &#34;AMS&#34; }, extensions: [&#34;AMSmath.js&#34;, &#34;AMSsymbols.js&#34;] } } }); MathJax.Hub.Queue(function() { // Fix  tags after MathJax finishes running. This is a // hack to overcome a shortcoming of Markdown. Discussion at // https://github.com/mojombo/jekyll/issues/199 var all = MathJax.Hub.getAllJax(), i; for(i = 0; i  Author: Xingfei Xu (116010252) Email: 116010252@link.cuhk.edu.cn Online Version: https://xuxife.github.io/posts/heat-simulation-report Source Code: https://github.com/xuxife/heat-simulation  Usage  Call ./heat-simulation to check the usage manual.  Usage: ./heat-simulation [-args] seq|pth|mpi -down whether down wall is on fire -f float the default temperature of fire (default 100) -h int the height of window (default 400) -left whether left wall is on fire -n int the number of threads (only for pthread) (default 2) -r float the default temperature in the room (default 20) -right whether right wall is on fire -up whether up wall is on fire -w int the width of window (default 400)   For instance, ./heat-simulation -w 200 -h 200 -up -n 2 pth will use two threads and create a 200x200 window with burning up wall.  Following output would be printed when the program begins running:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xuxife.github.io/posts/heat-simulation-report/" /><meta property="article:published_time" content="2018-12-01T16:29:08&#43;08:00"/>
+<meta property="article:modified_time" content="2018-12-01T16:29:08&#43;08:00"/>
+
+
+  <title>
+  
+       Report of Heat Parallel Simulation | Home | xuxife 
+  
+  </title>
+
+  <link rel="canonical" href="https://xuxife.github.io/posts/heat-simulation-report/">
+
+  
+  
+
+  
+  <link href="https://xuxife.github.io/css/vendors-extensions/fontawesome/all.min.css" rel="stylesheet">
+
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:300,400,500,600">
+  <link href="https://xuxife.github.io/css/font.css" rel="stylesheet"> 
+    
+  
+  <link href="https://xuxife.github.io/css/vendors/bootstrap4/bootstrap.min.css" rel="stylesheet">
+  <link href="https://xuxife.github.io/css/vendors-extensions/mdb/mdb.min.css" rel="stylesheet"> 
+  <link href="https://xuxife.github.io/css/vendors/mdb/style.min.css" rel="stylesheet"> 
+  <link href="https://xuxife.github.io/css/main.css" rel="stylesheet">
+
+
+  
+  <link rel="shortcut icon"
+  
+      href="https://xuxife.github.io/img/favicon.png"
+  
+  >
+
+
+  
+  
+
+  <style type="text/css">
+      @media (min-width: 800px) and (max-width: 850px) {
+              .navbar:not(.top-nav-collapse) {
+                  background: #1C2331!important;
+              }
+          }
+  </style>
+
+
+  
+    
+    <link rel="stylesheet" href="https://xuxife.github.io/js/vendors/katex/katex.min.css">
+  
+  
+
+  
+    
+    <link rel="stylesheet" href="https://xuxife.github.io/css/vendors/highlight/github-gist.css">
+  
+
+</head>
+
+  <body class="bg-light" data-spy="scroll" data-target="#page-scrollspy" data-offset="90">
+  
+    
+    
+
+    
+      
+
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar">
+    <div class="container">
+
+      
+      <a class="navbar-brand" href="https://xuxife.github.io">
+          
+        <img class="avatar" src="https://xuxife.github.io/img/favicon.png" style="width: 40px!important;height: auto;"  class="d-inline-block align-top" alt="" >
+        
+        <strong> xuxife</strong>
+      </a>
+
+      
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        
+        <ul class="navbar-nav mr-auto ">
+          <li class="nav-item ">
+            <a class="nav-link" href="https://xuxife.github.io">Home</a>
+          </li>
+          
+        </ul>
+
+      </div>
+
+    </div>
+  </nav>
+  
+ 
+      
+ 
+
+
+
+
+
+
+<div id="site-header" class="carousel slide carousel-fade" data-ride="carousel" style="height: 18rem;" >  
+
+  
+  
+  
+
+  
+  <div class="carousel-inner" role="listbox">
+    
+      
+
+        
+        <div class="carousel-item active">
+          <div class="view" style="background-image: url('https://xuxife.github.io/img/header-slides/FDD65BF97A581613C0E633F081326C4B-2880-0.png'); background-repeat: no-repeat; background-size: cover;">
+
+            
+            <div class="mask rgba-black-light d-flex justify-content-center align-items-center">
+
+              
+              
+              
+
+            </div>
+            
+
+          </div>
+        </div>
+        
+      
+    
+      
+
+        
+        <div class="carousel-item">
+          <div class="view" style="background-image: url('https://xuxife.github.io/img/header-slides//ash-edmonds-636862-unsplash.jpg'); background-repeat: no-repeat; background-size: cover;">
+
+            
+            <div class="mask rgba-black-light d-flex justify-content-center align-items-center">
+
+            
+
+            </div>
+            
+
+          </div>
+        </div>
+        
+      
+    
+
+  
+  </div>
+  
+
+  
+  <div class="carousel-content text-center white-text wow fadeIn">
+    <div class="row mx-0 headfont mt-3 pt-4">
+      
+      <div class="col-12 col-sm-5 align-middle">
+        <a href="https://xuxife.github.io">
+          
+            <img class="pull-right avatar avatar-md" src="https://xuxife.github.io/img/favicon.png" alt="" >
+          
+        </a>
+      </div>
+      
+      <div class="col-12 col-sm-7 text-left pl-2">
+        <a href="https://xuxife.github.io">
+          <h1 class="mb-2 h1" style="font-weight: 300;" >
+            <strong>Home | xuxife</strong>
+          </h1>
+        </a>
+        
+
+             
+        <div class="mt-2" style="font-size: 1rem; color: white;">
+            
+              <a href="//github.com/xuxife" target="_blank" rel="noopener"><i class="fab fa-github pr-1" aria-hidden="true"></i></a>    
+            
+            
+
+            
+
+            
+
+            
+
+            
+    
+            
+    
+        
+            
+                <a href="mailto:xuxife@gmail.com"><i class="far fa-envelope-open pr-1" aria-hidden="true"></i></a>
+            
+    
+            
+
+            
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  
+  
+  
+
+</div>
+  
+    
+
+    
+  
+  <main class="post-main-wrapper">
+    
+    
+    <div class="row">
+
+      
+
+      
+      <div class="container pr-5">
+      
+
+        
+        <div class="z-depth-1  post-wrapper white-bg single-post">
+
+          <div class="post-header text-center" >
+  <ul class="post-meta li-x">
+    
+      
+        <li><a href="https://xuxife.github.io/categories/report"><i class="fas fa-folder-open pr-1" aria-hidden="true"></i> report </a></li>
+      
+    
+    
+  </ul>
+
+  <div class="px-4 post-heading">Report of Heat Parallel Simulation</div>
+
+  <ul class="post-meta li-x mt-1">
+    
+      <li>Dec 1, 2018</li>
+    
+
+    
+      <li class="middot"></li>
+      <li>8 minutes read</li>
+    
+  </ul>
+  
+
+</div>
+
+
+          <div class="post-content markdown">
+            
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+  });
+  MathJax.Hub.Queue(function() {
+    // Fix <code> tags after MathJax finishes running. This is a
+    // hack to overcome a shortcoming of Markdown. Discussion at
+    // https://github.com/mojombo/jekyll/issues/199
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+
+  MathJax.Hub.Config({
+  // Autonumbering by mathjax
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+</script>
+
+<ul>
+<li><strong>Author:</strong> Xingfei Xu (116010252)</li>
+<li><strong>Email:</strong> <a href="mailto://116010252@link.cuhk.edu.cn">116010252@link.cuhk.edu.cn</a></li>
+<li><strong>Online Version:</strong> <a href="https://xuxife.github.io/posts/heat-simulation-report">https://xuxife.github.io/posts/heat-simulation-report</a></li>
+<li><strong>Source Code:</strong> <a href="https://github.com/xuxife/heat-simulation">https://github.com/xuxife/heat-simulation</a></li>
+</ul>
+
+<h2 id="usage">Usage</h2>
+
+<ul>
+<li>Call <code>./heat-simulation</code> to check the usage manual.</li>
+</ul>
+
+<pre><code class="language-shell">  Usage: ./heat-simulation [-args] seq|pth|mpi
+    -down
+          whether down wall is on fire
+    -f float
+          the default temperature of fire (default 100)
+    -h int
+          the height of window (default 400)
+    -left
+          whether left wall is on fire
+    -n int
+          the number of threads (only for pthread) (default 2)
+    -r float
+          the default temperature in the room (default 20)
+    -right
+          whether right wall is on fire
+    -up
+          whether up wall is on fire
+    -w int
+          the width of window (default 400)
+</code></pre>
+
+<ul>
+<li>For instance, <code>./heat-simulation -w 200 -h 200 -up -n 2 pth</code> will use two threads and create a 200x200 window with burning up wall.</li>
+</ul>
+
+<p>Following output would be printed when the program begins running:</p>
+
+<pre><code class="language-shell">  Start simulation using pth:
+  fire temperature 100.00, room temperature 20.00
+  Press 'r' to reset the room environment
+  Press Up/Down/Left/Right key to fire/unfire the corresponding wall
+  Wall Up is/are on fire
+</code></pre>
+
+<ul>
+<li>As the instruction shows, press ‘r’ key to <strong>reset</strong> the environment to room temperature. Press ‘Up/Down/Left/Right&rsquo; key to fire/unfire the corresponding wall.</li>
+</ul>
+
+<p>For instance, &lsquo;Right&rsquo; key was pressed after the simulation begins in the following figure.</p>
+
+<p><center>
+      <img src="https://i.loli.net/2018/11/28/5bfe4ce54817f.gif" width="250px"/>
+  </center></p>
+
+<ul>
+<li>Moreover, it&rsquo;s available to use mouse clicking/dragging in the simulation window to set new fire spots inside the room.</li>
+</ul>
+
+<p><center>
+      <img src="https://i.loli.net/2018/11/28/5bfe517b5f6dc.gif" width="250px"/>
+  </center></p>
+
+<h2 id="code-design">Code Design</h2>
+
+<h3 id="environment">Environment</h3>
+
+<ul>
+<li><p>A <strong>room</strong> is a space with four walls. The temperature of the whole room is set to <code>roomTemp</code>(room temperature). Four walls can be set on fire, the burning wall has a constant <code>fireTemp</code> temperature.</p></li>
+
+<li><p>The heat distribution is computed following Jacobi method:</p></li>
+</ul>
+
+<p>$$t_{i,j}=\left(t_{i-1,j}+t_{i+1,j}+t_{i,j-1}+t_{i,j+1}\right)/4$$</p>
+
+<ul>
+<li><p>The color (red and blue) indicates the temperature. Blue means cold, red means hot.</p></li>
+
+<li><p><strong>Task partition:</strong> computation tasks are seperated by rows.</p></li>
+</ul>
+
+<p><center>
+      <img src="https://i.loli.net/2018/11/29/5bfffe70c3d44.png" width="500px"/>
+  </center></p>
+
+<ul>
+<li>Multiple <code>FirePoints</code> can be set inside the room by clicking/dragging the mouse. The <code>FirePoints</code> are the spots burning and stored in a hashmap.</li>
+</ul>
+
+<h3 id="methods">Methods</h3>
+
+<p>The environment <strong>room</strong> has following methods.</p>
+
+<ul>
+<li><code>RowInterior</code> returns the row without two ends. Because two ends are the walls and we don&rsquo;t need to change the temperature of the walls.</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) RowInterior(y int) []float64 {
+  	start := r.index(1, y)
+  	return r.Temps[start : start+r.Dx()-2]
+  }
+</code></pre>
+
+<ul>
+<li><code>SetRowInterior</code>  sets the interior row with given data. The data must have the same length as <code>width-2</code> (width without two ends).</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) SetRowInterior(y int, row []float64) {
+  	if dx := r.Dx() - 2; len(row) != dx {
+  		panic(&quot;give a wrong length row&quot;)
+  	} else if count := copy(r.RowInterior(y), row); count != dx {
+  		panic(&quot;set new row fails&quot;)
+  	}
+  }
+</code></pre>
+
+<ul>
+<li><code>UpdatedRow</code> returns a copy of interior row according to Jacobian method. The returned copy has already been computed/updated. This is an unit computation action.</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) UpdatedRow(y int) []float64 {
+  	updated := make([]float64, r.Dx()-2)
+  	for i, j := 0, r.index(1, y); i &lt; r.Dx()-2; i++ {
+  		updated[i] = (r.Temps[i+j-1] + r.Temps[i+j+1] + r.Temps[i+j-r.Dx()] + r.Temps[i+j+r.Dx()]) / 4
+  	}
+  	return updated
+  }
+</code></pre>
+
+<h3 id="sequence">Sequence</h3>
+
+<p>Update the room sequentially is quite trivial:</p>
+
+<pre><code class="language-go">func (r *Room) UpdateSeq() {
+	r.FirePoint() // set the firepoints
+	updated := make(map[int][]float64, r.Dy()-2) // build a new hashmap
+	for y := r.Min.Y + 1; y &lt; r.Max.Y-1; y++ {
+		updated[y] = r.UpdatedRow(y) // get updated row
+	}
+	for y := range updated {
+		r.SetRowInterior(y, updated[y]) // set updated row
+	}
+}
+</code></pre>
+
+<h3 id="pthread">Pthread</h3>
+
+<p>Pthread has <code>PthCreate</code>, <code>PthJoin</code> and <code>UpdatePth</code> methods to create/join/updates the room.</p>
+
+<p><code>pthLength</code> is the length of rows need to be computed of one thread. <code>pthExtra</code> is only positve when the number of row is not divisable by the size.</p>
+
+<p>Thread 0 (the first thread) is responsible to compute the extra rows.</p>
+
+<p>Threads are created and joined only once. An infinite loop would be called in threads. Channel (a message passing concept in Go) can send signals and synchronise between threads.</p>
+
+<ul>
+<li><code>PthCreate</code> creates threads and initialize the variables for threads&rsquo; computations.</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) PthCreate(size int) {
+  	pthRoom, pthRanks = r, make([]int, size)
+  	pthLength, pthExtra = (r.Dy()-2)/size, (r.Dy()-2)%size
+  	pthThreads = make([]C.pthread_t, size) // make pthread_t
+  	pthExit = make(chan struct{}) // for exiting the threads properly
+  	pthAction = make([]chan struct{}, size) // channel to broadcast signal compute
+  	pthUpdate = make([]chan struct{}, size) // signal copying updated data to room
+  	for i := range pthThreads {
+  		pthRanks[i], pthAction[i], pthUpdate[i] = i, make(chan struct{}), make(chan struct{})
+  		if ret := C.create(&amp;pthThreads[i], unsafe.Pointer(&amp;pthRanks[i])); ret != 0 {
+  			panic(&quot;pthread create fail&quot;)
+  		}
+  	}
+  }
+</code></pre>
+
+<ul>
+<li><code>PthJoin</code> stops and joins threads.</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) PthJoin() {
+  	close(pthExit) // signal for return and close threads
+  	for i := range pthThreads {
+  		if ret := C.pthread_join(pthThreads[i], nil); ret != 0 {
+  			panic(&quot;pthread join fail&quot;)
+  		}
+  	}
+  }
+</code></pre>
+
+<ul>
+<li><code>UpdatePth</code> updates the room&rsquo;s temperature parallel by pthread once.</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) UpdatePth() {
+  	r.FirePoint() // set fire points
+  	for i := range pthAction {
+  		pthWg.Add(1)
+  		pthAction[i] &lt;- struct{}{} // signal for computing new temperatures
+  	}
+  	pthWg.Wait()
+  	for i := range pthUpdate {
+  		pthWg.Add(1)
+  		pthUpdate[i] &lt;- struct{}{} // signal for copying the updated data into room
+  	}
+  	pthWg.Wait()
+  }
+</code></pre>
+
+<ul>
+<li><code>pthWorker</code> is what a forked thread runs. Three main parts: exit, action and update.</li>
+</ul>
+
+<pre><code class="language-go">  func pthWorker(p unsafe.Pointer) unsafe.Pointer {
+  	rank := *(*int)(p)
+  	updated := make(map[int][]float64, pthLength+pthExtra)
+  	for {
+  		select {
+  		case &lt;-pthExit: // receive an exit signal
+  			return nil
+  		case &lt;-pthAction[rank]: // receive a signal to compute new temperature
+  			if pthExtra &gt; 0 &amp;&amp; rank == 0 {
+  				for y := pthRoom.Min.Y + 1; y &lt; pthRoom.Min.Y+1+pthExtra; y++ {
+  					updated[y] = pthRoom.UpdatedRow(y)
+  				}
+  			}
+  			start := pthRoom.Min.Y + 1 + pthExtra + pthLength*rank
+  			for y := start; y &lt; start+pthLength; y++ {
+  				updated[y] = pthRoom.UpdatedRow(y)
+  			}
+  		case &lt;-pthUpdate[rank]: // receive a signal to copy new data into room
+  			for y := range updated {
+  				pthRoom.SetRowInterior(y, updated[y])
+  			}
+  			updated = make(map[int][]float64, pthLength+pthExtra)
+  		}
+  		pthWg.Done()
+  	}
+  }
+</code></pre>
+
+<h3 id="mpi">MPI</h3>
+
+<p>MPI also have <code>MpiInit</code>, <code>MpiFinalize</code> and <code>UpdateMpi</code> to initialize/finalize environment and updates the room&rsquo;s temperature.</p>
+
+<ul>
+<li><code>MpiInit</code> initialize the MPI environment and prepare the variables such as scatter/gather counts/indexes.</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) MpiInit() {
+  	C.MPI_Init(nil, nil)
+  	var cRank, cSize C.int
+  	C.MPI_Comm_rank(C.MPI_COMM_WORLD, &amp;cRank)
+  	C.MPI_Comm_size(C.MPI_COMM_WORLD, &amp;cSize)
+  	rank, mpiSize = int(cRank), int(cSize)
+  	mpiLength, mpiExtra = (r.Dy()-2)/mpiSize, (r.Dy()-2)%mpiSize
+  	mpiScatterCount, mpiGatherCount = C.int((mpiLength+2)*r.Dx()), C.int(mpiLength*r.Dx())
+  	mpiGatherIndex = r.index(0, r.Min.Y+mpiLength*rank+mpiExtra+1)
+  	mpiScatterIndex = make([]int, mpiSize)
+  	for i := 0; i &lt; mpiSize; i++ {
+  		mpiScatterIndex[i] = r.index(0, r.Min.Y+mpiLength*i+mpiExtra)
+  	}
+  }
+</code></pre>
+
+<p>What&rsquo;s more, only one process (process 0) would connect to X server. When the GUI window was closed, process 0 would call <code>MpiAbort</code> to stop the mpi processes.</p>
+
+<p>MPI differs from pthread and sequence because MPI are running without sharing memory. Single process has a partition of task (several rows). But the process also needs knowing the above row and the below row of the task partition to update the temperature based on Jacobi method.</p>
+
+<p>Root process would scatter then gather the data for all processes. When scattering, one extra row above and one extra row below are sent to the corresponding process. When gathering, only the non-overlapping rows are gathered.</p>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/29/5c0007d03ceae.png" width="600px"/>
+</center></p>
+
+<ul>
+<li><code>mpiScatter</code> and <code>mpiGather</code>:</li>
+</ul>
+
+<pre><code class="language-go">  func mpiScatter(r *Room) {
+  	if rank == 0 {
+  		for i := 1; i &lt; mpiSize; i++ {
+  			C.MPI_Send(ptr(&amp;r.Temps[mpiScatterIndex[i]]), mpiScatterCount, C.MPI_DOUBLE, C.int(i), 0, C.MPI_COMM_WORLD)
+  		}
+  	} else {
+  		C.MPI_Recv(ptr(&amp;r.Temps[mpiScatterIndex[rank]]), mpiScatterCount, C.MPI_DOUBLE, 0, 0, C.MPI_COMM_WORLD, &amp;mpiStatus)
+  	}
+  }
+  
+  func mpiGather(r *Room) {
+  	C.MPI_Gather(ptr(&amp;r.Temps[mpiGatherIndex]), mpiGatherCount, C.MPI_DOUBLE, ptr(&amp;r.Temps[mpiGatherIndex]), mpiGatherCount, C.MPI_DOUBLE, 0, C.MPI_COMM_WORLD)
+  }
+</code></pre>
+
+<ul>
+<li><code>UpdateMpi</code>:</li>
+</ul>
+
+<pre><code class="language-go">  func (r *Room) UpdateMpi() {
+  	r.FirePoint()
+  	updated := make(map[int][]float64, mpiLength+mpiExtra)
+  	mpiScatter(r) // scatter rows
+      if mpiExtra &gt; 0 &amp;&amp; rank == 0 { // p0 computes the extra rows
+  		for y := r.Min.Y + 1; y &lt; r.Min.Y+1+mpiExtra; y++ {
+  			updated[y] = r.UpdatedRow(y)
+  		}
+  	}
+  	start := r.Min.Y + 1 + mpiExtra + mpiLength*rank
+  	for y := start; y &lt; start+mpiLength; y++ { // all processes do the task
+  		updated[y] = r.UpdatedRow(y)
+  	}
+  	for y := range updated {
+  		r.SetRowInterior(y, updated[y])
+  	}
+  	mpiGather(r) // gather the updated data
+  }
+</code></pre>
+
+<h2 id="experiment-and-analysis">Experiment and Analysis</h2>
+
+<p>In my experiment, I test the sequence/pthread/mpi methods in multiple conditions/loads. The window&rsquo;s size varies from 100x100 to 1000x1000. The operation&rsquo;s costs are benchmarked at least hundreds of iterations.</p>
+
+<p>Test cases are ‘100x100’, ‘300x300’, ‘500x500’, ‘700x700’ and ‘1000x1000’.</p>
+
+<pre><code class="language-go">var testCase = []int{1e2, 3e2, 5e2, 7e2, 1e3}
+</code></pre>
+
+<p>Benchmark code (pthread), cases/loads are tested in 1-4 threads:</p>
+
+<pre><code class="language-go">func BenchmarkPthread(b *testing.B) {
+	for _, width := range testCase { // loads
+		for i := 1; i &lt; 5; i++ { // number of threads
+			b.Run(fmt.Sprintf(&quot;width:%d-%d&quot;, width, i), func(b *testing.B) {
+				r := NewRoom(0, 0, width, width, 25)
+				r.SetWall(true, false, false, false, 100, 20)
+				r.PthCreate(i)
+				defer r.PthJoin()
+				b.ResetTimer()
+				for j := 0; j &lt; b.N; j++ {
+					r.UpdatePth()
+				}
+			})
+		}
+	}
+}
+</code></pre>
+
+<h3 id="pthread-benchmark-result">Pthread Benchmark Result</h3>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/30/5c00e26f3121f.png" width="600px"/>
+</center></p>
+
+<ul>
+<li>Pthread n stands for calling n threads.</li>
+<li>We can observe that parallel cannot decrease computing time in low loads. Only the window is large (load is high), multiple threads running can boost the computation apparently.</li>
+<li>In low load condition, more threads cannot bring faster performance. This is possible that more threads need more communications and increase communication cost.</li>
+</ul>
+
+<h3 id="mpi-benchmark-result">MPI Benchmark Result</h3>
+
+<p><center>
+    <img src="https://i.loli.net/2018/11/30/5c00e423ec577.png" width="600px"/>
+</center></p>
+
+<ul>
+<li>Mpi has an average lower performance than pthread. This probably blames to data sacttering/gathering. Data needs to duplicate for processes finishing computing, which increases communication cost.</li>
+<li>As the number of processes increases, the number of duplicate rows increases. Because every process needs at least one extra row connecting to another process. Hence we cannot observe an apparent speedup with more processes.</li>
+<li>The algorithm still needs to be optimaized, especially the <code>mpiScatter</code>/<code>mpiGather</code> part. MPI doesn&rsquo;t have a method to scatter data with overlapping. The scatter is using is based on <code>MPI_Send</code> and <code>MPI_Recv</code>.</li>
+</ul>
+
+          </div>
+
+          
+          <div class="row">
+            <div class="col-md-8">
+            
+            </div>
+            
+          </div>
+          
+
+          
+          <div class="row pt-3">
+            <div class="col-md-6">
+              
+                <a href=https://xuxife.github.io/posts/nbody-report/ class="post-meta">Previous
+                  <div class="pt-2 pb-5 d-flex">
+                    <i class="fas fa-angle-left text-grey font-weight-bold mr-2 active-color"></i>
+                    <span>Report of Parallel N-Body Simulation</span>
+                  </div>
+                </a>
+              
+            </div>
+            
+            <div class="col-md-6 text-right" >
+              
+            </div>
+          </div>
+
+          
+
+        </div>
+        
+
+      </div>
+      
+
+      
+
+    </div>
+    
+
+
+  </main>
+  
+
+
+    
+    
+
+<footer class="page-footer text-center font-small mt-4 wow fadeIn">
+
+
+  
+  <div class="pb-2 mt-5 pt-5">
+    
+      <a href="//github.com/xuxife " target="_blank" rel="noopener"><i class="fab fa-github mr-3" aria-hidden="true"></i></a>    
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    
+        <a href="mailto:xuxife@gmail.com"><i class="far fa-envelope-open mr-3" aria-hidden="true"></i></a>
+    
+
+    
+
+    
+
+  </div>
+  
+
+  
+  <div class="copyright py-4">
+    
+    <span>  2016 - 2018 &copy; | Theme <a href='https://github.com/orianna-zzo/AllinOne' target="_blank">AllinOne</a> by <a href='https://github.com/orianna-zzo' target="_blank">Orianna</a>  </span>
+  </div>
+  
+
+</footer>
+
+
+    
+
+
+
+
+
+
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/jquery/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/jquery/jquery.smooth-scroll.min.js"></script>
+
+
+
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/popper.min.js"></script>
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/holder.min.js"></script>
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors-extensions/bootstrap4/bootstrap.js" ></script>
+
+<script type="text/javascript" src="https://xuxife.github.io/js/vendors/mdb/mdb.min.js"></script>
+
+<script type="text/javascript" src="https://xuxife.github.io/js/main.js"></script>
+
+
+
+  
+  <script src="https://xuxife.github.io/js/vendors/highlight.pack.js"> </script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+ 
+  <script src="https://xuxife.github.io/js/vendors/katex/katex.min.js"> </script>
+  <script src="https://xuxife.github.io/js/vendors/katex/contrib/auto-render.min.js"></script>
+
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          renderMathInElement(document.body);
+      });
+  </script>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+  
+  new WOW().init();
+</script>
+
+
+
+
+  </body>
+</html>

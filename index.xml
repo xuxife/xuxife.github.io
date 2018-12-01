@@ -6,10 +6,19 @@
     <description>Recent content on Home | xuxife</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zn-Hans</language>
-    <lastBuildDate>Thu, 22 Nov 2018 12:01:00 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 01 Dec 2018 16:29:08 +0800</lastBuildDate>
     
 	<atom:link href="https://xuxife.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Report of Heat Parallel Simulation</title>
+      <link>https://xuxife.github.io/posts/heat-simulation-report/</link>
+      <pubDate>Sat, 01 Dec 2018 16:29:08 +0800</pubDate>
+      
+      <guid>https://xuxife.github.io/posts/heat-simulation-report/</guid>
+      <description>MathJax.Hub.Config({ tex2jax: { inlineMath: [[&#39;$&#39;,&#39;$&#39;], [&#39;\\(&#39;,&#39;\\)&#39;]], displayMath: [[&#39;$$&#39;,&#39;$$&#39;]], processEscapes: true, processEnvironments: true, skipTags: [&#39;script&#39;, &#39;noscript&#39;, &#39;style&#39;, &#39;textarea&#39;, &#39;pre&#39;], TeX: { equationNumbers: { autoNumber: &#34;AMS&#34; }, extensions: [&#34;AMSmath.js&#34;, &#34;AMSsymbols.js&#34;] } } }); MathJax.Hub.Queue(function() { // Fix  tags after MathJax finishes running. This is a // hack to overcome a shortcoming of Markdown. Discussion at // https://github.com/mojombo/jekyll/issues/199 var all = MathJax.Hub.getAllJax(), i; for(i = 0; i  Author: Xingfei Xu (116010252) Email: 116010252@link.cuhk.edu.cn Online Version: https://xuxife.github.io/posts/heat-simulation-report Source Code: https://github.com/xuxife/heat-simulation  Usage  Call ./heat-simulation to check the usage manual.  Usage: ./heat-simulation [-args] seq|pth|mpi -down whether down wall is on fire -f float the default temperature of fire (default 100) -h int the height of window (default 400) -left whether left wall is on fire -n int the number of threads (only for pthread) (default 2) -r float the default temperature in the room (default 20) -right whether right wall is on fire -up whether up wall is on fire -w int the width of window (default 400)   For instance, ./heat-simulation -w 200 -h 200 -up -n 2 pth will use two threads and create a 200x200 window with burning up wall.  Following output would be printed when the program begins running:</description>
+    </item>
     
     <item>
       <title>Report of Parallel N-Body Simulation</title>

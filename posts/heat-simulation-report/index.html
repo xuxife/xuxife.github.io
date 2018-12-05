@@ -401,7 +401,7 @@
   </center></p>
 
 <ul>
-<li>Multiple <code>FirePoints</code> can be set inside the room by clicking/dragging the mouse. The <code>FirePoints</code> are the spots burning and stored in a hashmap.</li>
+<li>Multiple <code>FirePoints</code> can be set inside the room by clicking/dragging the mouse. The <code>FirePoints</code> are stored in a hashmap.</li>
 </ul>
 
 <h3 id="methods">Methods</h3>
@@ -462,13 +462,13 @@
 
 <h3 id="pthread">Pthread</h3>
 
-<p>Pthread has <code>PthCreate</code>, <code>PthJoin</code> and <code>UpdatePth</code> methods to create/join/updates the room.</p>
+<p>Pthread has <code>PthCreate</code>, <code>PthJoin</code> and <code>UpdatePth</code> methods to create/join threads and updates the room temperature.</p>
 
-<p><code>pthLength</code> is the length of rows need to be computed of one thread. <code>pthExtra</code> is only positve when the number of row is not divisable by the size.</p>
+<p><code>pthLength</code> is the number of rows need to be computed of one thread. <code>pthExtra</code> is only positve when the number of rows is not divisable by the pthread size.</p>
 
 <p>Thread 0 (the first thread) is responsible to compute the extra rows.</p>
 
-<p>Threads are created and joined only once. An infinite loop would be called in threads. Channel (a message passing concept in Go) can send signals and synchronise between threads.</p>
+<p>Threads are created and joined only once. An infinite loop would be called in threads. Signals would be passed from main thread to worker threads for synchronizing.</p>
 
 <ul>
 <li><code>PthCreate</code> creates threads and initialize the variables for threads&rsquo; computations.</li>
@@ -680,9 +680,9 @@
 </center></p>
 
 <ul>
-<li>Mpi has an average lower performance than pthread. This probably blames to data sacttering/gathering. Data needs to duplicate for processes finishing computing, which increases communication cost.</li>
-<li>As the number of processes increases, the number of duplicate rows increases. Because every process needs at least one extra row connecting to another process. Hence we cannot observe an apparent speedup with more processes.</li>
-<li>The algorithm still needs to be optimaized, especially the <code>mpiScatter</code>/<code>mpiGather</code> part. MPI doesn&rsquo;t have a method to scatter data with overlapping. The scatter is using is based on <code>MPI_Send</code> and <code>MPI_Recv</code>.</li>
+<li>Mpi has an average lower performance than pthread. This probably blames to data sacttering/gathering. Data needs to duplicate during scattering/gathering, which increases communication cost.</li>
+<li>As the number of processes increases, the number of duplicate rows increases. Because every process needs at least one extra row. Hence we cannot observe an apparent speedup with more processes.</li>
+<li>The algorithm still needs to be optimaized, especially the <code>mpiScatter</code>/<code>mpiGather</code> part. MPI doesn&rsquo;t have a method to scatter data with overlapping data. The scatter used in this assignment is based on <code>MPI_Send</code> and <code>MPI_Recv</code>.</li>
 </ul>
 
           </div>
